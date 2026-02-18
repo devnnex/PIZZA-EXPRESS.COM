@@ -854,10 +854,39 @@ function persistCart() {
 }
 
 // Actualizar contador del ícono del carrito
+// 1. Modifica tu función actual para que actualice AMBOS contadores
 function updateCartBadge() {
   const count = cart.reduce((sum, i) => sum + i.qty, 0);
-  cartCountEl.textContent = count;
+  
+  // Contador del header (el que ya tienes)
+  if(cartCountEl) cartCountEl.textContent = count;
+  
+  // Nuevo contador de la burbuja flotante
+  const floatingCountEl = document.querySelector('.bubble-count');
+  if(floatingCountEl) floatingCountEl.textContent = count;
 }
+
+// 2. Lógica para mostrar/ocultar la burbuja al hacer scroll
+const floatingCart = document.getElementById('floating-cart');
+const headerCart = document.getElementById('open-cart'); // Tu carrito original del header
+
+window.addEventListener('scroll', () => {
+  const headerCartPos = headerCart.getBoundingClientRect().bottom;
+
+  if (headerCartPos < 0) {
+    // Si el carrito del header ya no se ve, muestra la burbuja
+    floatingCart.classList.remove('hidden');
+  } else {
+    // Si el header es visible, oculta la burbuja
+    floatingCart.classList.add('hidden');
+  }
+});
+
+// 3. Hacer que el botón flotante también abra el carrito
+document.getElementById('open-cart-floating').addEventListener('click', () => {
+  cartDrawer.classList.remove('hidden');
+  cartDrawer.setAttribute('aria-hidden', 'false');
+});
 
 // Renderizar los ítems del carrito
 // ---------- Carrito ----------
@@ -1106,7 +1135,7 @@ checkoutForm.addEventListener('change', updateCheckoutTotals);
 
 
 // URL del endpoint de Google Apps Script (base de datos de pedidos)
-// const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwm_1k9_4u68gAgUuSbvOXA5jfq1aIMJIaaFNDiB9PKa0yFBrZhhhMVQQQ-Qc22jeEb/exec";
+const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwm_1k9_4u68gAgUuSbvOXA5jfq1aIMJIaaFNDiB9PKa0yFBrZhhhMVQQQ-Qc22jeEb/exec";
 
 
 // Envío por WhatsApp
@@ -1121,6 +1150,27 @@ checkoutForm.addEventListener('submit', (e) => {
   const payment = fd.get('payment') || '';
   const address = fd.get('address')?.trim() || '';
   const notes = fd.get('notes')?.trim() || '';
+
+
+  
+  // 🔎 Validación de barrio obligatorio en domicilio
+if (method === 'domicilio') {
+  const addressLower = address.toLowerCase();
+  const hasBarrio = 
+    addressLower.includes('barrio') ||
+    addressLower.includes('barr.') ||
+    addressLower.includes('br.');
+
+  if (!hasBarrio) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Debes indicar el barrio',
+      text: 'Por favor agrega el barrio en la dirección.',
+      confirmButtonColor: '#e91e63'
+    });
+    return;
+  }
+}
 
   let textParts = [];
 
@@ -1190,7 +1240,7 @@ cart.forEach(item => {
  
 
   // 🟡 2. ENVIAR A SHEETS EN SEGUNDO PLANO
- /* const orderData = {
+  const orderData = {
     fecha: new Date().toLocaleString(),
     nombre: clientName,
     telefono: clientPhone,
@@ -1213,7 +1263,7 @@ cart.forEach(item => {
     body: JSON.stringify(orderData),
     headers: { "Content-Type": "application/json" },
     keepalive: true // 🔑 importante para que no se cancele al redireccionar
-  }); */
+  });
 
 });
 
@@ -1439,7 +1489,6 @@ document.addEventListener("click", (e) => {
 
 
 // ============Fin de codigo de Descarga QR=================
-
 
 
 
