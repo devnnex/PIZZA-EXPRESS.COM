@@ -1106,7 +1106,7 @@ checkoutForm.addEventListener('change', updateCheckoutTotals);
 
 
 // URL del endpoint de Google Apps Script (base de datos de pedidos)
-const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwm_1k9_4u68gAgUuSbvOXA5jfq1aIMJIaaFNDiB9PKa0yFBrZhhhMVQQQ-Qc22jeEb/exec";
+// const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwm_1k9_4u68gAgUuSbvOXA5jfq1aIMJIaaFNDiB9PKa0yFBrZhhhMVQQQ-Qc22jeEb/exec";
 
 
 // Envío por WhatsApp
@@ -1190,7 +1190,7 @@ cart.forEach(item => {
  
 
   // 🟡 2. ENVIAR A SHEETS EN SEGUNDO PLANO
-  const orderData = {
+ /* const orderData = {
     fecha: new Date().toLocaleString(),
     nombre: clientName,
     telefono: clientPhone,
@@ -1213,7 +1213,7 @@ cart.forEach(item => {
     body: JSON.stringify(orderData),
     headers: { "Content-Type": "application/json" },
     keepalive: true // 🔑 importante para que no se cancele al redireccionar
-  });
+  }); */
 
 });
 
@@ -1439,6 +1439,7 @@ document.addEventListener("click", (e) => {
 
 
 // ============Fin de codigo de Descarga QR=================
+
 
 
 
