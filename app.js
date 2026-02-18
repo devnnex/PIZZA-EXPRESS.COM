@@ -1135,7 +1135,7 @@ checkoutForm.addEventListener('change', updateCheckoutTotals);
 
 
 // URL del endpoint de Google Apps Script (base de datos de pedidos)
-const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwm_1k9_4u68gAgUuSbvOXA5jfq1aIMJIaaFNDiB9PKa0yFBrZhhhMVQQQ-Qc22jeEb/exec";
+//const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwm_1k9_4u68gAgUuSbvOXA5jfq1aIMJIaaFNDiB9PKa0yFBrZhhhMVQQQ-Qc22jeEb/exec";
 
 
 // Envío por WhatsApp
@@ -1240,30 +1240,30 @@ cart.forEach(item => {
  
 
   // 🟡 2. ENVIAR A SHEETS EN SEGUNDO PLANO
-  const orderData = {
-    fecha: new Date().toLocaleString(),
-    nombre: clientName,
-    telefono: clientPhone,
-    metodo: method,
-    pago: payment,
-    direccion: address,
-    notas: notes,
-    total: total,
-    carrito: cart.map(i => ({
-      producto: i.title,
-      cantidad: i.qty,
-      precio: i.price,
-      extras: i.extras?.map(e => `${e.qty}x ${e.name}`).join(', ') || ''
-    }))
-  };
+  // const orderData = {
+  //   fecha: new Date().toLocaleString(),
+  //   nombre: clientName,
+  //   telefono: clientPhone,
+  //   metodo: method,
+  //   pago: payment,
+  //   direccion: address,
+  //   notas: notes,
+  //   total: total,
+  //   carrito: cart.map(i => ({
+  //     producto: i.title,
+  //     cantidad: i.qty,
+  //     precio: i.price,
+  //     extras: i.extras?.map(e => `${e.qty}x ${e.name}`).join(', ') || ''
+  //   }))
+  // };
 
-  fetch(GOOGLE_SHEET_API, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(orderData),
-    headers: { "Content-Type": "application/json" },
-    keepalive: true // 🔑 importante para que no se cancele al redireccionar
-  });
+  // fetch(GOOGLE_SHEET_API, {
+  //   method: "POST",
+  //   mode: "no-cors",
+  //   body: JSON.stringify(orderData),
+  //   headers: { "Content-Type": "application/json" },
+  //   keepalive: true // 🔑 importante para que no se cancele al redireccionar
+  // });
 
 });
 
