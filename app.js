@@ -2,461 +2,308 @@
 // app.js — lógica completa para The Boss (con imágenes locales)
 
 // ---------- Config ----------
-const BUSINESS_PHONE = '573042591610'; // <- reemplaza por el número real (sin '+')
+const BUSINESS_PHONE = '573022246472'; // <- número del negocio para recibir pedidos por WhatsApp
 const DELIVERY_FEE = 0; // tarifa por defecto de domicilio
 
-// ---------- Datos de ejemplo ----------
+// ---------- Carta ----------
+const pizzaSizeDefinitions = [
+  { key: 'personal', label: 'Personal - 4 porciones' },
+  { key: 'normal', label: 'Normal - 8 porciones' },
+  { key: 'mediana', label: 'Mediana - 12 porciones' },
+  { key: 'familiar', label: 'Familiar - 16 porciones' },
+  { key: 'mega', label: 'Mega La Super J.J - 20 porciones' }
+];
+
+const pizzaBorderExtras = [
+  { name: 'Borde de queso', price: 7000 },
+  { name: 'Borde de bocadillo', price: 7000 }
+];
+
+function pizzaSizes(id, image, prices) {
+  return pizzaSizeDefinitions.map((size, index) => ({
+    id: `${id}-${size.key}`,
+    label: size.label,
+    price: prices[index],
+    image
+  }));
+}
+
 const products = [
-  //PIZZAS
-{
-  id: 'pz1',
-  category: 'Pizzas',
-  title: 'Hawaiana',
-  price: 14000,
-  desc: 'Pizza hawaiana clásica.',
-  ingredients: ['Piña','Jamón','Queso'],
-  image: 'images/pizza-hawaiana.png',
-  sizes: [
-    { id:'pz1-mini', label:'Mini 20cm', price:14000, image:'images/pizza-hawaiana.png'},
-    { id:'pz1-small', label:'Small 30cm', price:27000, image:'images/pizza-hawaiana.png'},
-    { id:'pz1-medium', label:'Medium 40cm', price:45000, image:'images/pizza-hawaiana.png'},
-    { id:'pz1-grande', label:'Grande 50cm', price:90000, image:'images/pizza-hawaiana.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz2',
-  category:'Pizzas',
-  title:'Bocadillo Queso',
-  price:14000,
-  desc:'Pizza dulce de bocadillo con queso.',
-  ingredients:['Bocadillo','Queso'],
-  image:'images/pizza-bocadillo.png',
-  sizes:[
-    {id:'pz2-mini',label:'Mini 20cm',price:14000,image:'images/pizza-bocadillo.png'},
-    {id:'pz2-small',label:'Small 30cm',price:25000,image:'images/pizza-bocadillo.png'},
-    {id:'pz2-medium',label:'Medium 40cm',price:40000,image:'images/pizza-bocadillo.png'},
-    {id:'pz2-grande',label:'Grande 50cm',price:65000,image:'images/pizza-bocadillo.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz3',
-  category:'Pizzas',
-  title:'Napolitana',
-  price:14000,
-  desc:'Pizza napolitana clásica.',
-  ingredients:['Salsa napolitana','Mozzarella','Tomate','Albahaca','Aceite de oliva'],
-  image:'images/pizza-napolitana.png',
-  sizes:[
-    {id:'pz3-mini',label:'Mini 20cm',price:14000,image:'images/pizza-napolitana.png'},
-    {id:'pz3-small',label:'Small 30cm',price:25000,image:'images/pizza-napolitana.png'},
-    {id:'pz3-medium',label:'Medium 40cm',price:40000,image:'images/pizza-napolitana.png'},
-    {id:'pz3-grande',label:'Grande 50cm',price:70000,image:'images/pizza-napolitana.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz4',
-  category:'Pizzas',
-  title:'Carnes Frías',
-  price:16000,
-  desc:'Pizza con mix de carnes.',
-  ingredients:['Salsa napolitana','Salami','Cábano','Tocineta','Queso'],
-  image:'images/pizza-carnes-frias.png',
-  sizes:[
-    {id:'pz4-mini',label:'Mini 20cm',price:16000,image:'images/pizza-carnes-frias.png'},
-    {id:'pz4-small',label:'Small 30cm',price:30000,image:'images/pizza-carnes-frias.png'},
-    {id:'pz4-medium',label:'Medium 40cm',price:60000,image:'images/pizza-carnes-frias.png'},
-    {id:'pz4-grande',label:'Grande 50cm',price:100000,image:'images/pizza-carnes-frias.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz5',
-  category:'Pizzas',
-  title:'Pollo Jamón',
-  price:16000,
-  desc:'Pizza de pollo con jamón.',
-  ingredients:['Salsa napolitana','Pollo','Jamón','Queso'],
-  image:'images/pizza-pollo-jamon.png',
-  sizes:[
-    {id:'pz5-mini',label:'Mini 20cm',price:16000,image:'images/pizza-pollo-jamon.png'},
-    {id:'pz5-small',label:'Small 30cm',price:30000,image:'images/pizza-pollo-jamon.png'},
-    {id:'pz5-medium',label:'Medium 40cm',price:55000,image:'images/pizza-pollo-jamon.png'},
-    {id:'pz5-grande',label:'Grande 50cm',price:97000,image:'images/pizza-pollo-jamon.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz6',
-  category:'Pizzas',
-  title:'Pepperoni',
-  price:16000,
-  desc:'Pizza clásica de pepperoni.',
-  ingredients:['Salsa napolitana','Pepperoni','Queso'],
-  image:'images/pizza-pepperoni.png',
-  sizes:[
-    {id:'pz6-mini',label:'Mini 20cm',price:16000,image:'images/pizza-pepperoni.png'},
-    {id:'pz6-small',label:'Small 30cm',price:30000,image:'images/pizza-pepperoni.png'},
-    {id:'pz6-medium',label:'Medium 40cm',price:50000,image:'images/pizza-pepperoni.png'},
-    {id:'pz6-grande',label:'Grande 50cm',price:85000,image:'images/pizza-pepperoni.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz7',
-  category:'Pizzas',
-  title:'Salami Americano',
-  price:22000,
-  desc:'Pizza con salami y vegetales.',
-  ingredients:['Salsa napolitana','Salami','Cebolla','Pimentón','Queso'],
-  image:'images/pizza-salami.png',
-  sizes:[
-    {id:'pz7-mini',label:'Mini 20cm',price:22000,image:'images/pizza-salami.png'},
-    {id:'pz7-small',label:'Small 30cm',price:35000,image:'images/pizza-salami.png'},
-    {id:'pz7-medium',label:'Medium 40cm',price:55000,image:'images/pizza-salami.png'},
-    {id:'pz7-grande',label:'Grande 50cm',price:100000,image:'images/pizza-salami.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz8',
-  category:'Pizzas',
-  title:'Pollo Champiñón',
-  price:16000,
-  desc:'Pizza de pollo con champiñones.',
-  ingredients:['Salsa napolitana','Pollo','Champiñón','Queso'],
-  image:'images/pizza-pollo-champinon.png',
-  sizes:[
-    {id:'pz8-mini',label:'Mini 20cm',price:16000,image:'images/pizza-pollo-champinon.png'},
-    {id:'pz8-small',label:'Small 30cm',price:32000,image:'images/pizza-pollo-champinon.png'},
-    {id:'pz8-medium',label:'Medium 40cm',price:55000,image:'images/pizza-pollo-champinon.png'},
-    {id:'pz8-grande',label:'Grande 50cm',price:100000,image:'images/pizza-pollo-champinon.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-}
-,
-{
-  id:'pz9',
-  category:'Pizzas',
-  title:'Especial',
-  price:22000,
-  desc:'Pizza especial con mix de carnes.',
-  ingredients:['Salsa napolitana','Salami','Cábano','Tocineta','Pollo','Queso'],
-  image:'images/pizza-especial.png',
-  sizes:[
-    {id:'pz9-mini',label:'Mini 20cm',price:22000,image:'images/pizza-especial.png'},
-    {id:'pz9-small',label:'Small 30cm',price:37000,image:'images/pizza-especial.png'},
-    {id:'pz9-medium',label:'Medium 40cm',price:70000,image:'images/pizza-especial.png'},
-    {id:'pz9-grande',label:'Grande 50cm',price:120000,image:'images/pizza-especial.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz10',
-  category:'Pizzas',
-  title:'Mexicana',
-  price:22000,
-  desc:'Pizza estilo mexicano picante.',
-  ingredients:['Salsa napolitana','Carne molida','Jalapeño','Pimentón','Pico de gallo','Queso'],
-  image:'images/pizza-mexicana.png',
-  sizes:[
-    {id:'pz10-mini',label:'Mini 20cm',price:22000,image:'images/pizza-mexicana.png'},
-    {id:'pz10-small',label:'Small 30cm',price:37000,image:'images/pizza-mexicana.png'},
-    {id:'pz10-medium',label:'Medium 40cm',price:65000,image:'images/pizza-mexicana.png'},
-    {id:'pz10-grande',label:'Grande 50cm',price:105000,image:'images/pizza-mexicana.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz11',
-  category:'Pizzas',
-  title:'Ranchera',
-  price:25000,
-  desc:'Pizza ranchera con carne y maíz.',
-  ingredients:['Salsa napolitana','Carne molida','Cebolla','Tocineta','Maíz tierno','Queso'],
-  image:'images/pizza-ranchera.png',
-  sizes:[
-    {id:'pz11-mini',label:'Mini 20cm',price:25000,image:'images/pizza-ranchera.png'},
-    {id:'pz11-small',label:'Small 30cm',price:40000,image:'images/pizza-ranchera.png'},
-    {id:'pz11-medium',label:'Medium 40cm',price:68000,image:'images/pizza-ranchera.png'},
-    {id:'pz11-grande',label:'Grande 50cm',price:110000,image:'images/pizza-ranchera.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz12',
-  category:'Pizzas',
-  title:'Vegetariana',
-  price:25000,
-  desc:'Pizza con vegetales frescos.',
-  ingredients:['Salsa napolitana','Cebolla','Pimentón','Tomate','Aceitunas','Champiñón','Orégano','Queso'],
-  image:'images/pizza-vegetariana.png',
-  sizes:[
-    {id:'pz12-mini',label:'Mini 20cm',price:25000,image:'images/pizza-vegetariana.png'},
-    {id:'pz12-small',label:'Small 30cm',price:45000,image:'images/pizza-vegetariana.png'},
-    {id:'pz12-medium',label:'Medium 40cm',price:65000,image:'images/pizza-vegetariana.png'},
-    {id:'pz12-grande',label:'Grande 50cm',price:100000,image:'images/pizza-vegetariana.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz13',
-  category:'Pizzas',
-  title:'De la Casa',
-  price:25000,
-  desc:'Pizza premium con pollo y camarones.',
-  ingredients:['Salsa napolitana','Pollo','Camarón','Cábano','Salami','Cebolla','Pimentón','Queso'],
-  image:'images/pizza-casa.png',
-  sizes:[
-    {id:'pz13-mini',label:'Mini 20cm',price:25000,image:'images/pizza-casa.png'},
-    {id:'pz13-small',label:'Small 30cm',price:45000,image:'images/pizza-casa.png'},
-    {id:'pz13-medium',label:'Medium 40cm',price:80000,image:'images/pizza-casa.png'},
-    {id:'pz13-grande',label:'Grande 50cm',price:135000,image:'images/pizza-casa.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-},
-{
-  id:'pz14',
-  category:'Pizzas',
-  title:'Camarones',
-  price:27000,
-  desc:'Pizza de camarones especial.',
-  ingredients:['Salsa napolitana','Cebolla','Pimentón','Cábano','Tocineta','Camarón','Queso'],
-  image:'images/pizza-camarones.png',
-  sizes:[
-    {id:'pz14-mini',label:'Mini 20cm',price:27000,image:'images/pizza-camarones.png'},
-    {id:'pz14-small',label:'Small 30cm',price:46000,image:'images/pizza-camarones.png'},
-    {id:'pz14-medium',label:'Medium 40cm',price:72000,image:'images/pizza-camarones.png'},
-    {id:'pz14-grande',label:'Grande 50cm',price:120000,image:'images/pizza-camarones.png'}
-  ],
-  extras:[{name:'Borde de queso Mini',price:5000},{name:'Borde de queso Small',price:8000}]
-}
-,
+  // PIZZAS TRADICIONALES
+  {
+    id: 'trad-jamon-queso',
+    category: 'Pizzas Tradicionales',
+    title: 'Jamón y Queso',
+    price: 10000,
+    desc: 'Jamón, queso mozzarella y salsa napolitana.',
+    ingredients: ['Jamón', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-pollo-jamon.png',
+    sizes: pizzaSizes('trad-jamon-queso', 'images/pizza-pollo-jamon.png', [10000, 20000, 30000, 58000, 115000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'trad-hawaiana',
+    category: 'Pizzas Tradicionales',
+    title: 'Hawaiana',
+    price: 10000,
+    desc: 'Piña, jamón, queso mozzarella y salsa napolitana.',
+    ingredients: ['Piña', 'Jamón', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-hawaiana.png',
+    sizes: pizzaSizes('trad-hawaiana', 'images/pizza-hawaiana.png', [10000, 20000, 30000, 58000, 115000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'trad-pollo',
+    category: 'Pizzas Tradicionales',
+    title: 'Pollo',
+    price: 10000,
+    desc: 'Pollo, queso mozzarella y salsa napolitana.',
+    ingredients: ['Pollo', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-pollo-jamon.png',
+    sizes: pizzaSizes('trad-pollo', 'images/pizza-pollo-jamon.png', [10000, 20000, 30000, 58000, 115000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'trad-salami',
+    category: 'Pizzas Tradicionales',
+    title: 'Salami',
+    price: 10000,
+    desc: 'Salami, queso mozzarella y salsa napolitana.',
+    ingredients: ['Salami', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-salami.png',
+    sizes: pizzaSizes('trad-salami', 'images/pizza-salami.png', [10000, 20000, 30000, 58000, 115000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'trad-cebolla',
+    category: 'Pizzas Tradicionales',
+    title: 'Cebolla',
+    price: 10000,
+    desc: 'Cebolla, queso mozzarella y salsa napolitana.',
+    ingredients: ['Cebolla', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-vegetariana.png',
+    sizes: pizzaSizes('trad-cebolla', 'images/pizza-vegetariana.png', [10000, 20000, 30000, 58000, 115000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'trad-pimenton',
+    category: 'Pizzas Tradicionales',
+    title: 'Pimentón',
+    price: 10000,
+    desc: 'Pimentón, queso mozzarella y salsa napolitana.',
+    ingredients: ['Pimentón', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-vegetariana.png',
+    sizes: pizzaSizes('trad-pimenton', 'images/pizza-vegetariana.png', [10000, 20000, 30000, 58000, 115000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'trad-maiz',
+    category: 'Pizzas Tradicionales',
+    title: 'Maíz',
+    price: 10000,
+    desc: 'Maíz, queso mozzarella y salsa napolitana.',
+    ingredients: ['Maíz', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-vegetariana.png',
+    sizes: pizzaSizes('trad-maiz', 'images/pizza-vegetariana.png', [10000, 20000, 30000, 58000, 115000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'trad-champinones',
+    category: 'Pizzas Tradicionales',
+    title: 'Champiñones',
+    price: 10000,
+    desc: 'Champiñón, queso mozzarella y salsa napolitana.',
+    ingredients: ['Champiñón', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-pollo-champinon.png',
+    sizes: pizzaSizes('trad-champinones', 'images/pizza-pollo-champinon.png', [10000, 20000, 30000, 58000, 115000]),
+    extras: pizzaBorderExtras
+  },
 
-//PANZEROTTIS
-{
-  id:'pzrt1',
-  category:'Panzerottis',
-  title:'Hawaiano',
-  price:16000,
-  desc:'Panzerotti hawaiano.',
-  ingredients:['Piña','Jamón','Queso'],
-  image:'images/panzerotti-hawaiano.png'
-},
-{
-  id:'pzrt2',
-  category:'Panzerottis',
-  title:'Express',
-  price:18000,
-  desc:'Panzerotti de pollo y champiñón.',
-  ingredients:['Pollo','Champiñón','Jamón','Queso'],
-  image:'images/panzerotti-express.png'
-},
-{
-  id:'pzrt3',
-  category:'Panzerottis',
-  title:'Ranchero',
-  price:18000,
-  desc:'Panzerotti ranchero.',
-  ingredients:['Carne molida','Cábano','Cebolla','Pimentón','Queso'],
-  image:'images/panzerotti-ranchero.png'
-},
+  // PIZZAS ESPECIALES
+  {
+    id: 'esp-peperoni',
+    category: 'Pizzas Especiales',
+    title: 'Peperoni',
+    price: 15000,
+    desc: 'Peperoni, queso mozzarella y salsa napolitana.',
+    ingredients: ['Peperoni', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-pepperoni.png',
+    sizes: pizzaSizes('esp-peperoni', 'images/pizza-pepperoni.png', [15000, 23000, 35000, 60000, 120000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'esp-tocineta',
+    category: 'Pizzas Especiales',
+    title: 'Tocineta',
+    price: 15000,
+    desc: 'Tocineta, queso mozzarella y salsa napolitana.',
+    ingredients: ['Tocineta', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-carnes-frias.png',
+    sizes: pizzaSizes('esp-tocineta', 'images/pizza-carnes-frias.png', [15000, 23000, 35000, 60000, 120000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'esp-mexicana',
+    category: 'Pizzas Especiales',
+    title: 'Mexicana',
+    price: 15000,
+    desc: 'Carne molida, cebolla, pimentón, queso mozzarella y salsa napolitana.',
+    ingredients: ['Carne molida', 'Cebolla', 'Pimentón', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-mexicana.png',
+    sizes: pizzaSizes('esp-mexicana', 'images/pizza-mexicana.png', [15000, 23000, 35000, 60000, 120000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'esp-3-carnes',
+    category: 'Pizzas Especiales',
+    title: '3 Carnes',
+    price: 15000,
+    desc: 'Jamón, pollo, salami, queso mozzarella y salsa napolitana.',
+    ingredients: ['Jamón', 'Pollo', 'Salami', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-carnes-frias.png',
+    sizes: pizzaSizes('esp-3-carnes', 'images/pizza-carnes-frias.png', [15000, 23000, 35000, 60000, 120000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'esp-mixta',
+    category: 'Pizzas Especiales',
+    title: 'Mixta',
+    price: 15000,
+    desc: 'Carne molida, pollo, queso mozzarella y salsa napolitana.',
+    ingredients: ['Carne molida', 'Pollo', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-especial.png',
+    sizes: pizzaSizes('esp-mixta', 'images/pizza-especial.png', [15000, 23000, 35000, 60000, 120000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'esp-pizza-perro',
+    category: 'Pizzas Especiales',
+    title: 'Pizza Perro',
+    price: 18000,
+    desc: 'Chorizo, butifarra, papa ripio, salsa tártara, salsa piña, doble queso, queso mozzarella y salsa napolitana.',
+    ingredients: ['Chorizo', 'Butifarra', 'Papa ripio', 'Salsa tártara', 'Salsa piña', 'Doble queso', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-ranchera.png',
+    sizes: pizzaSizes('esp-pizza-perro', 'images/pizza-ranchera.png', [18000, 25000, 38000, 67000, 125000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'esp-pizza-jj',
+    category: 'Pizzas Especiales',
+    title: 'Pizza JJ',
+    price: 18000,
+    desc: 'Jamón, peperoni, pollo, tocineta, cebolla, pimentón, maíz, queso mozzarella y salsa napolitana.',
+    ingredients: ['Jamón', 'Peperoni', 'Pollo', 'Tocineta', 'Cebolla', 'Pimentón', 'Maíz', 'Queso mozzarella', 'Salsa napolitana'],
+    image: 'images/pizza-casa.png',
+    sizes: pizzaSizes('esp-pizza-jj', 'images/pizza-casa.png', [18000, 25000, 38000, 67000, 125000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'esp-criolla',
+    category: 'Pizzas Especiales',
+    title: 'Pizza Criolla',
+    price: 18000,
+    desc: 'Carne desmechada, chorizo y maíz.',
+    ingredients: ['Carne desmechada', 'Chorizo', 'Maíz'],
+    image: 'images/pizza-ranchera.png',
+    sizes: pizzaSizes('esp-criolla', 'images/pizza-ranchera.png', [18000, 25000, 38000, 67000, 125000]),
+    extras: pizzaBorderExtras
+  },
+  {
+    id: 'esp-3-estaciones',
+    category: 'Pizzas Especiales',
+    title: 'Pizza 3 Estaciones',
+    price: 18000,
+    desc: 'Ingredientes al gusto.',
+    ingredients: ['Ingredientes al gusto'],
+    image: 'images/pizza-especial.png',
+    sizes: pizzaSizes('esp-3-estaciones', 'images/pizza-especial.png', [18000, 25000, 38000, 67000, 125000]),
+    extras: pizzaBorderExtras
+  },
 
-//ESPECIALES
-{
-  id:'esp1',
-  category:'Especiales',
-  title:'Lasagna Mixta',
-  price:21000,
-  desc:'Lasaña mixta de carne y pollo.',
-  ingredients:['Carne','Pollo','Queso','Salsa napolitana'],
-  image:'images/lasagna-mixta.png'
-},
+  // PANCEROTY
+  {
+    id: 'panceroty-jj',
+    category: 'Panceroty',
+    title: 'Panceroty JJ',
+    price: 15000,
+    desc: 'Jamón, pollo y 3 carnes.',
+    ingredients: ['Jamón', 'Pollo', '3 carnes'],
+    image: 'images/panzerotti-express.png'
+  },
 
-//BEBIDAS
-{
-  id:'beb1',
-  category:'Bebidas',
-  title:'Gaseosa 1.5L',
-  price:8000,
-  desc:'Gaseosa presentación 1.5 litros.',
-  ingredients:['Gaseosa'],
-  image:'images/gaseosa-15.png'
-},
-{
-  id:'beb2',
-  category:'Bebidas',
-  title:'Gaseosa Pet 400ml',
-  price:4000,
-  desc:'Gaseosa personal 400ml.',
-  ingredients:['Gaseosa'],
-  image:'images/gaseosa-400.png'
-},
-{
-  id:'beb3',
-  category:'Bebidas',
-  title:'Hit Pet 500ml',
-  price:3500,
-  desc:'Jugo Hit 500ml.',
-  ingredients:['Jugo Hit'],
-  image:'images/hit-500.png'
-},
-{
-  id:'beb4',
-  category:'Bebidas',
-  title:'Soda',
-  price:4000,
-  desc:'Soda refrescante.',
-  ingredients:['Soda'],
-  image:'images/soda.png'
-},
-{
-  id:'beb5',
-  category:'Bebidas',
-  title:'Coronita',
-  price:5000,
-  desc:'Cerveza Coronita.',
-  ingredients:['Cerveza'],
-  image:'images/coronita.png'
-},
-{
-  id:'beb6',
-  category:'Bebidas',
-  title:'Agua',
-  price:3000,
-  desc:'Agua embotellada.',
-  ingredients:['Agua'],
-  image:'images/agua.png'
-},
-{
-  id:'beb7',
-  category:'Bebidas',
-  title:'Michelada',
-  price:2500,
-  desc:'Preparación michelada.',
-  ingredients:['Michelada'],
-  image:'images/michelada.png'
-}
-,
+  // LASAGNA
+  {
+    id: 'lasagna-pollo',
+    category: 'Lasagna',
+    title: 'Lasagna de Pollo',
+    price: 12000,
+    desc: 'Lasagna de pollo.',
+    ingredients: ['Pollo', 'Queso', 'Salsa'],
+    image: 'images/lasagna-mixta.png'
+  },
+  {
+    id: 'lasagna-carne',
+    category: 'Lasagna',
+    title: 'Lasagna de Carne',
+    price: 12000,
+    desc: 'Lasagna de carne.',
+    ingredients: ['Carne', 'Queso', 'Salsa'],
+    image: 'images/lasagna-mixta.png'
+  },
+  {
+    id: 'lasagna-mixta',
+    category: 'Lasagna',
+    title: 'Lasagna Mixta',
+    price: 15000,
+    desc: 'Lasagna mixta de pollo y carne.',
+    ingredients: ['Pollo', 'Carne', 'Queso', 'Salsa'],
+    image: 'images/lasagna-mixta.png'
+  },
 
-//ADICIONALES
-{
-  id:'add1',
-  category:'Adicionales',
-  title:'Piña',
-  price:4000,
-  desc:'Porción adicional de piña.',
-  ingredients:['Piña'],
-  image:'images/adicional-pina.png'
-},
-{
-  id:'add2',
-  category:'Adicionales',
-  title:'Jamón',
-  price:2000,
-  desc:'Porción adicional de jamón.',
-  ingredients:['Jamón'],
-  image:'images/adicional-jamon.png'
-},
-{
-  id:'add3',
-  category:'Adicionales',
-  title:'Salami',
-  price:4000,
-  desc:'Porción adicional de salami.',
-  ingredients:['Salami'],
-  image:'images/adicional-salami.png'
-},
-{
-  id:'add4',
-  category:'Adicionales',
-  title:'Cábano',
-  price:4000,
-  desc:'Porción adicional de cábano.',
-  ingredients:['Cábano'],
-  image:'images/adicional-cabano.png'
-},
-{
-  id:'add5',
-  category:'Adicionales',
-  title:'Tocineta',
-  price:3000,
-  desc:'Porción adicional de tocineta.',
-  ingredients:['Tocineta'],
-  image:'images/adicional-tocineta.png'
-},
-{
-  id:'add6',
-  category:'Adicionales',
-  title:'Pollo Desmechado',
-  price:6000,
-  desc:'Porción adicional de pollo desmechado.',
-  ingredients:['Pollo desmechado'],
-  image:'images/adicional-pollo.png'
-},
-{
-  id:'add7',
-  category:'Adicionales',
-  title:'Carne Molida',
-  price:6000,
-  desc:'Porción adicional de carne molida.',
-  ingredients:['Carne molida'],
-  image:'images/adicional-carne.png'
-},
-{
-  id:'add8',
-  category:'Adicionales',
-  title:'Pepperoni',
-  price:5000,
-  desc:'Porción adicional de pepperoni.',
-  ingredients:['Pepperoni'],
-  image:'images/adicional-pepperoni.png'
-},
-{
-  id:'add9',
-  category:'Adicionales',
-  title:'Bocadillo',
-  price:3000,
-  desc:'Porción adicional de bocadillo.',
-  ingredients:['Bocadillo'],
-  image:'images/adicional-bocadillo.png'
-},
-{
-  id:'add10',
-  category:'Adicionales',
-  title:'Tomate',
-  price:3000,
-  desc:'Porción adicional de tomate.',
-  ingredients:['Tomate'],
-  image:'images/adicional-tomate.png'
-},
-{
-  id:'add11',
-  category:'Adicionales',
-  title:'Jalapeño',
-  price:3000,
-  desc:'Porción adicional de jalapeño.',
-  ingredients:['Jalapeño'],
-  image:'images/adicional-jalapeno.png'
-},
-{
-  id:'add12',
-  category:'Adicionales',
-  title:'Maíz',
-  price:3000,
-  desc:'Porción adicional de maíz.',
-  ingredients:['Maíz'],
-  image:'images/adicional-maiz.png'
-}
+  // AREPAS
+  {
+    id: 'arepa-tumbarrancho-pollo',
+    category: 'Arepas',
+    title: 'Tumbarrancho de Pollo',
+    price: 7000,
+    desc: 'Pollo, mortadela, queso, verduras y salsa.',
+    ingredients: ['Pollo', 'Mortadela', 'Queso', 'Verduras', 'Salsa'],
+    image: 'images/panzerotti-hawaiano.png'
+  },
+  {
+    id: 'arepa-tumbarrancho-carne',
+    category: 'Arepas',
+    title: 'Tumbarrancho de Carne',
+    price: 7000,
+    desc: 'Carne, mortadela, queso, verduras y salsa.',
+    ingredients: ['Carne', 'Mortadela', 'Queso', 'Verduras', 'Salsa'],
+    image: 'images/panzerotti-ranchero.png'
+  },
+  {
+    id: 'arepa-tumbarrancho-mixto',
+    category: 'Arepas',
+    title: 'Tumbarrancho Mixto',
+    price: 10000,
+    desc: 'Pollo, carne, mortadela, queso, verduras y salsa.',
+    ingredients: ['Pollo', 'Carne', 'Mortadela', 'Queso', 'Verduras', 'Salsa'],
+    image: 'images/panzerotti-express.png'
+  },
+  {
+    id: 'arepa-cabimera-especial',
+    category: 'Arepas',
+    title: 'Cabimera Especial',
+    price: 20000,
+    desc: 'Pechuga a la plancha, chuleta, chuleta ahumada, carne desmechada, tocineta, queso, huevo, verduras y salsa.',
+    ingredients: ['Pechuga a la plancha', 'Chuleta', 'Chuleta ahumada', 'Carne desmechada', 'Tocineta', 'Queso', 'Huevo', 'Verduras', 'Salsa'],
+    image: 'images/panzerotti-express.png'
+  }
 ];
 
 const categories = [...new Set(products.map(p=>p.category))];
 
 // ---------- Estado ----------
 let cart = JSON.parse(localStorage.getItem('tb_cart') || '[]');
-let activeCategory = 'Pizzas';
+let activeCategory = 'Pizzas Tradicionales';
 
 // ---------- DOM refs ----------
 const catalogEl = document.getElementById('catalog');
@@ -1489,6 +1336,7 @@ document.addEventListener("click", (e) => {
 
 
 // ============Fin de codigo de Descarga QR=================
+
 
 
 
